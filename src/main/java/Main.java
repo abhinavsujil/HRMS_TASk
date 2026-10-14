@@ -1,12 +1,32 @@
-import com.hrms.util.DBConnection;
-import java.sql.Connection;
+import com.hrms.OrganizationManager;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        try (Connection con = DBConnection.getConnection()) {
-            System.out.println("Connected!");
-        } catch (Exception e) {
-            e.printStackTrace();
+        Scanner sc = new Scanner(System.in);
+        OrganizationManager orgManager = new OrganizationManager();
+
+        while (true) {
+            System.out.println();
+            System.out.println("1. Create new Organization");
+            System.out.println("2. Login to Organization");
+            System.out.println("3. Exit");
+            System.out.print("Choose: ");
+            String choice = sc.nextLine();
+
+            switch (choice) {
+                case "1":
+                    orgManager.create(sc);
+                    break;
+                case "2":
+                    System.out.println("Login is coming next.");
+                    break;
+                case "3":
+                    System.out.println("Bye.");
+                    return;
+                default:
+                    System.out.println("Invalid choice.");
+            }
         }
     }
 }
