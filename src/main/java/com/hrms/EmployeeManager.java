@@ -17,20 +17,32 @@ public class EmployeeManager {
             System.out.println("4. Delete employee");
             System.out.println("5. Back");
             System.out.print("Choose: ");
-            String choice = sc.nextLine();
 
-            switch (choice) {
-                case "1": add(sc, orgId); break;
-                case "2": view(orgId); break;
-                case "3": update(sc, orgId); break;
-                case "4": delete(sc, orgId); break;
-                case "5": return;
-                default: System.out.println("Invalid choice.");
+            int choice = 0;
+            try {
+                choice = Integer.parseInt(sc.nextLine());
+            } catch (Exception e) {
+                System.out.println("Please type a number.");
+                continue;
+            }
+
+            if (choice == 1) {
+                add(sc, orgId);
+            } else if (choice == 2) {
+                view(orgId);
+            } else if (choice == 3) {
+                update(sc, orgId);
+            } else if (choice == 4) {
+                delete(sc, orgId);
+            } else if (choice == 5) {
+                break;
+            } else {
+                System.out.println("Wrong choice.");
             }
         }
     }
 
-    private void add(Scanner sc, int orgId) {
+    public void add(Scanner sc, int orgId) {
         System.out.print("Name: ");
         String name = sc.nextLine();
         System.out.print("Email: ");
@@ -38,46 +50,43 @@ public class EmployeeManager {
         System.out.print("Phone: ");
         String phone = sc.nextLine();
 
-        String sql = "INSERT INTO employee (org_id, name, email, phone, joined_on) "
-                + "VALUES (?, ?, ?, ?, CURDATE())";
-
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                    "INSERT INTO employee (org_id, name, email, phone, joined_on) VALUES (?, ?, ?, ?, CURDATE())");
             ps.setInt(1, orgId);
             ps.setString(2, name);
             ps.setString(3, email);
             ps.setString(4, phone);
             ps.executeUpdate();
             System.out.println("Employee added.");
+            con.close();
         } catch (Exception e) {
-            System.out.println("Could not add: " + e.getMessage());
+            System.out.println("Could not add employee.");
         }
     }
 
-    private void view(int orgId) {
-        String sql = "SELECT emp_id, name, email, phone, joined_on FROM employee WHERE org_id = ?";
-
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+    public void view(int orgId) {
+        try {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                    "SELECT * FROM employee WHERE org_id = ?");
             ps.setInt(1, orgId);
-            try (ResultSet rs = ps.executeQuery()) {
-                boolean any = false;
-                while (rs.next()) {
-                    any = true;
-                    System.out.println(rs.getInt("emp_id") + " | " + rs.getString("name")
-                            + " | " + rs.getString("email") + " | " + rs.getString("phone")
-                            + " | " + rs.getDate("joined_on"));
-                }
-                if (!any) {
-                    System.out.println("No employees yet.");
-                }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                System.out.println(rs.getInt("emp_id") + " | "
+                        + rs.getString("name") + " | "
+                        + rs.getString("email") + " | "
+                        + rs.getString("phone") + " | "
+                        + rs.getString("joined_on"));
             }
+            con.close();
         } catch (Exception e) {
-            System.out.println("Could not view: " + e.getMessage());
+            System.out.println("Could not show employees.");
         }
     }
 
-    private void update(Scanner sc, int orgId) {
+    public void update(Scanner sc, int orgId) {
         System.out.print("Employee id to update: ");
         int id = Integer.parseInt(sc.nextLine());
         System.out.print("New name: ");
@@ -87,37 +96,46 @@ public class EmployeeManager {
         System.out.print("New phone: ");
         String phone = sc.nextLine();
 
-        String sql = "UPDATE employee SET name = ?, email = ?, phone = ? "
-                + "WHERE emp_id = ? AND org_id = ?";
-
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                    "UPDATE employee SET name = ?, email = ?, phone = ? WHERE emp_id = ? AND org_id = ?");
             ps.setString(1, name);
             ps.setString(2, email);
             ps.setString(3, phone);
             ps.setInt(4, id);
             ps.setInt(5, orgId);
             int rows = ps.executeUpdate();
-            System.out.println(rows == 0 ? "No such employee." : "Employee updated.");
+            if (rows == 0) {
+                System.out.println("No such employee.");
+            } else {
+                System.out.println("Employee updated.");
+            }
+            con.close();
         } catch (Exception e) {
-            System.out.println("Could not update: " + e.getMessage());
+            System.out.println("Could not update.");
         }
     }
 
-    private void delete(Scanner sc, int orgId) {
+    public void delete(Scanner sc, int orgId) {
         System.out.print("Employee id to delete: ");
         int id = Integer.parseInt(sc.nextLine());
 
-        String sql = "DELETE FROM employee WHERE emp_id = ? AND org_id = ?";
-
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                    "DELETE FROM employee WHERE emp_id = ? AND org_id = ?");
             ps.setInt(1, id);
             ps.setInt(2, orgId);
             int rows = ps.executeUpdate();
-            System.out.println(rows == 0 ? "No such employee." : "Employee deleted.");
+            if (rows == 0) {
+                System.out.println("No such employee.");
+            } else {
+                System.out.println("Employee deleted.");
+            }
+            con.close();
         } catch (Exception e) {
-            System.out.println("Could not delete: " + e.getMessage());
+            System.out.println("Could not delete.");
         }
     }
 }
