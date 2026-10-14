@@ -20,7 +20,7 @@ public class Dashboard {
                     new EmployeeManager().menu(sc, orgId);
                     break;
                 case "2":
-                    System.out.println("Attendance module is coming soon.");
+                    new AttendanceManager().menu(sc, orgId);
                     break;
                 case "3":
                     System.out.println("Salary module is coming soon.");
