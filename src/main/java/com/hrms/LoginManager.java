@@ -1,7 +1,5 @@
 package com.hrms;
 
-
-
 import com.hrms.util.DBConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,81 +16,82 @@ public class LoginManager {
             System.out.println("3. Back to main menu");
             System.out.println("4. Exit");
             System.out.print("Choose: ");
-            String choice = sc.nextLine();
 
-            switch (choice) {
-                case "1":
-                    int orgId = login(sc);
-                    if (orgId != -1) {
-                        new Dashboard().show(sc, orgId);
-                        return;
-                    }
+            int choice = 0;
+            try {
+                choice = Integer.parseInt(sc.nextLine());
+            } catch (Exception e) {
+                System.out.println("Please type a number.");
+                continue;
+            }
+
+            if (choice == 1) {
+                int orgId = login(sc);
+                if (orgId != -1) {
+                    new Dashboard().show(sc, orgId);
                     break;
-                case "2":
-                    forgotPassword(sc);
-                    break;
-                case "3":
-                    return;
-                case "4":
-                    System.out.println("Bye.");
-                    System.exit(0);
-                default:
-                    System.out.println("Invalid choice.");
+                }
+            } else if (choice == 2) {
+                forgotPassword(sc);
+            } else if (choice == 3) {
+                break;
+            } else if (choice == 4) {
+                System.out.println("Bye.");
+                System.exit(0);
+            } else {
+                System.out.println("Wrong choice.");
             }
         }
     }
 
-    private int login(Scanner sc) {
+    public int login(Scanner sc) {
         System.out.print("Email: ");
         String email = sc.nextLine();
         System.out.print("Password: ");
         String password = sc.nextLine();
 
-        String sql = "SELECT org_id, org_name FROM organization WHERE email = ? AND password = ?";
-
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
+        int orgId = -1;
+        try {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                    "SELECT org_id, org_name FROM organization WHERE email = ? AND password = ?");
             ps.setString(1, email);
             ps.setString(2, password);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    System.out.println("Welcome to " + rs.getString("org_name"));
-                    return rs.getInt("org_id");
-                }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                System.out.println("Welcome to " + rs.getString("org_name"));
+                orgId = rs.getInt("org_id");
+            } else {
+                System.out.println("Wrong email or password.");
             }
-            System.out.println("Wrong email or password.");
-
+            con.close();
         } catch (Exception e) {
-            System.out.println("Login failed: " + e.getMessage());
+            System.out.println("Login failed.");
         }
-        return -1;
+        return orgId;
     }
 
-    private void forgotPassword(Scanner sc) {
+    public void forgotPassword(Scanner sc) {
         System.out.print("Enter your email: ");
         String email = sc.nextLine();
         System.out.print("Enter new password: ");
         String newPassword = sc.nextLine();
 
-        String sql = "UPDATE organization SET password = ? WHERE email = ?";
-
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
+        try {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                    "UPDATE organization SET password = ? WHERE email = ?");
             ps.setString(1, newPassword);
             ps.setString(2, email);
-
             int rows = ps.executeUpdate();
             if (rows == 0) {
                 System.out.println("No organization found with this email.");
             } else {
                 System.out.println("Password changed. Please login again.");
             }
-
+            con.close();
         } catch (Exception e) {
-            System.out.println("Could not change password: " + e.getMessage());
+            System.out.println("Could not change password.");
         }
     }
 }
