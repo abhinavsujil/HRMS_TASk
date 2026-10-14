@@ -1,4 +1,5 @@
 import com.hrms.OrganizationManager;
+import com.hrms.LoginManager;
 import java.util.Scanner;
 
 public class Main {
@@ -19,7 +20,8 @@ public class Main {
                     orgManager.create(sc);
                     break;
                 case "2":
-                    System.out.println("Login is coming next.");
+                    new LoginManager().loginMenu(sc);
+
                     break;
                 case "3":
                     System.out.println("Bye.");
