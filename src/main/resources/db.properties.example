@@ -1,0 +1,3 @@
+db.url=jdbc:mysql://localhost:3306/hrms_db
+db.user=hrms_user
+db.password=root
