@@ -23,10 +23,10 @@ public class Dashboard {
                     new AttendanceManager().menu(sc, orgId);
                     break;
                 case "3":
-                    System.out.println("Salary module is coming soon.");
+                    new SalaryManager().menu(sc, orgId);
                     break;
                 case "4":
-                    System.out.println("Notice module is coming soon.");
+                    new NoticeManager().menu(sc, orgId);;
                     break;
                 case "5":
                     System.out.println("Logged out.");
