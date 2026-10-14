@@ -17,7 +17,7 @@ public class Dashboard {
 
             switch (choice) {
                 case "1":
-                    System.out.println("Employee module is coming next.");
+                    new EmployeeManager().menu(sc, orgId);
                     break;
                 case "2":
                     System.out.println("Attendance module is coming soon.");

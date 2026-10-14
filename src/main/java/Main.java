@@ -1,5 +1,6 @@
 import com.hrms.OrganizationManager;
 import com.hrms.LoginManager;
+import com.hrms.EmployeeManager;
 import java.util.Scanner;
 
 public class Main {
